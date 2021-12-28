@@ -1,9 +1,13 @@
 # cc-Movie
 a program i made for playing movies or videos in cc tweaked
 
+What this program can do  
+20fps video! (sometimes 15-10)  
+play video from a file  
+play video from your screen  
+
 Todo :  
 clean up code.  
-make it read video files.  
 add support for sound.  
 make it perform compression.  
 add gui into moniter.  
