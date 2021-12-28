@@ -1,20 +1,41 @@
 -- trys to remove unneeded redraw calls
 -- works alot better without UseTermBlit on.
 -- due to the fact that blit draws it all in 1 call it kinda makes this irrelevant
-UseBuffer = true
+UseBuffer = false
 -- this is a remade video player that is alot faster and doesnt have any where as much screen tear
 UseTermBlit = true
---restarts program every screen update.
---makes program crash for some reason.
+-- dont change this value here change below
 UseDevMode = false
 DevModeWaitTime = 5
 IpToConnectTo = "http://localhost:8080/"
 
+--chanelog 
+--made value moniter size
+--made moniter use find instead of wrap
 
+--resulstion of the moniter when it is using complex image formula
+UseComplexImage = false
+
+if UseComplexImage then
+MoniterX = 308
+MoniterY = 243
+else
 MoniterX = 164
 MoniterY = 81
+end
 
-while UseDevMode == false do
+--UseComplexImage = false
+
+
+
+--haff moniter size
+-- MoniterX = 80
+-- MoniterY = 45
+
+--start drawing on moniter
+
+
+while true do
 
     local request = http.get(IpToConnectTo)
     contents = request.readAll()
@@ -42,8 +63,7 @@ while UseDevMode == false do
     ColorToDec[16] = 32768
 
 
-    --start drawing on moniter
-    moniter = peripheral.wrap("top")
+    moniter = peripheral.find("monitor")
     moniter.setTextScale(0.5)
     term.redirect(moniter)
 
@@ -129,6 +149,73 @@ while UseDevMode == false do
     CharactorToBlit["8"] = "e"
     CharactorToBlit["9"] = "f"
 
+    CharactorToBinary = {}
+    CharactorToBinary["*"] = "000000"
+    CharactorToBinary["+"] = "000001"
+    CharactorToBinary[","] = "000010"
+    CharactorToBinary["-"] = "000011"
+    CharactorToBinary["."] = "000100"
+    CharactorToBinary["/"] = "000101"
+    CharactorToBinary["0"] = "000110"
+    CharactorToBinary["1"] = "000111"
+    CharactorToBinary["2"] = "001000"
+    CharactorToBinary["3"] = "001001"
+    CharactorToBinary["4"] = "001010"
+    CharactorToBinary["5"] = "001011"
+    CharactorToBinary["6"] = "001100"
+    CharactorToBinary["7"] = "001101"
+    CharactorToBinary["8"] = "001110"
+    CharactorToBinary["9"] = "001111"
+    CharactorToBinary[":"] = "010000"
+    CharactorToBinary[";"] = "010001"
+    CharactorToBinary["<"] = "010010"
+    CharactorToBinary["="] = "010011"
+    CharactorToBinary[">"] = "010100"
+    CharactorToBinary["?"] = "010101"
+    CharactorToBinary["@"] = "010110"
+    CharactorToBinary["A"] = "010111"
+    CharactorToBinary["B"] = "011000"
+    CharactorToBinary["C"] = "011001"
+    CharactorToBinary["D"] = "011010"
+    CharactorToBinary["E"] = "011011"
+    CharactorToBinary["F"] = "011100"
+    CharactorToBinary["G"] = "011101"
+    CharactorToBinary["H"] = "011110"
+    CharactorToBinary["I"] = "011111"
+    CharactorToBinary["J"] = "100000"
+    CharactorToBinary["K"] = "100001"
+    CharactorToBinary["L"] = "100010"
+    CharactorToBinary["M"] = "100011"
+    CharactorToBinary["N"] = "100100"
+    CharactorToBinary["O"] = "100101"
+    CharactorToBinary["P"] = "100110"
+    CharactorToBinary["Q"] = "100111"
+    CharactorToBinary["R"] = "101000"
+    CharactorToBinary["S"] = "101001"
+    CharactorToBinary["T"] = "101010"
+    CharactorToBinary["U"] = "101011"
+    CharactorToBinary["V"] = "101100"
+    CharactorToBinary["W"] = "101101"
+    CharactorToBinary["X"] = "101110"
+    CharactorToBinary["Y"] = "101111"
+    CharactorToBinary["Z"] = "110000"
+    CharactorToBinary["["] = "110001"
+    CharactorToBinary["\\"] = "110010"
+    CharactorToBinary["]"] = "110011"
+    CharactorToBinary["^"] = "110100"
+    CharactorToBinary["_"] = "110101"
+    CharactorToBinary["`"] = "110110"
+    CharactorToBinary["a"] = "110111"
+    CharactorToBinary["b"] = "111000"
+    CharactorToBinary["c"] = "111001"
+    CharactorToBinary["d"] = "111010"
+    CharactorToBinary["e"] = "111011"
+    CharactorToBinary["f"] = "111100"
+    CharactorToBinary["g"] = "111101"
+    CharactorToBinary["h"] = "111110"
+    CharactorToBinary["i"] = "111111"
+
+
 
     term.setCursorPos(1,1)
 
@@ -140,71 +227,181 @@ while UseDevMode == false do
     end
 
     --tests if its using the newer render method or the old crappy one
-    if UseTermBlit == false then
-        --term.clear()
-        --repeat for every char in the file
-        for y=0, MoniterY do
-            for x=0, MoniterX do
-                --get the char
-                ChractorNumber = y + (x * (MoniterY - 1)) + 128
-                Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
-                --get the color
-                if UseBuffer == false then ScreenBuffer[x .. ":" .. y] = nil end
-                -- looks if its already in the buffer (meaning its that color already)
-                if ScreenBuffer[x .. ":" .. y] == Charactor then
-                else
-                    --draw the pixel
+    if UseComplexImage == false then
+        if UseTermBlit == false then
+            --term.clear()
+            --repeat for every char in the file
+            for y=0, MoniterY do
+                for x=0, MoniterX do
+                    --get the char
+                    ChractorNumber = y + (x * (MoniterY - 1)) + 128
+                    Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
+                    --get the color
+                    if UseBuffer == false then ScreenBuffer[x .. ":" .. y] = nil end
+                    -- looks if its already in the buffer (meaning its that color already)
+                    if ScreenBuffer[x .. ":" .. y] == Charactor then
+                    else
+                        --draw the pixel
+                        if Charactor == "" then break end
+                        --sets the pos and the color of the pixel
+                        moniter.setBackgroundColor(CharactorToDec[Charactor])
+                        moniter.setCursorPos(x + 1, y)
+                        --draws the pixel
+                        moniter.write(" ")
+                        --used in case you wanna see it draw in slow mo
+                        --os.sleep(0.1)
+                        ScreenBuffer[x .. ":" .. y] = Charactor
+                    end
+                end 
+            end
+        else
+            --repeat for every line
+            for y=0, (MoniterY - 1) do
+                --these values are used for what it should right and what colors it should use
+                Row = ""
+                RowLeagth = ""
+                --runs through the line and gets the color and the char
+                for x=0, (MoniterX - 1) do
+                    --get the char
+                    ChractorNumber = y + (x * (MoniterY - 1)) + 128
+                    Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
+                    --looks if its the end of the line
                     if Charactor == "" then break end
-                    --sets the pos and the color of the pixel
-                    moniter.setBackgroundColor(CharactorToDec[Charactor])
-                    moniter.setCursorPos(x + 1, y)
-                    --draws the pixel
-                    moniter.write(" ")
-                    --used in case you wanna see it draw in slow mo
+                    --adds the char to the row
+                    Row = Row .. CharactorToBlit[Charactor]
+                    RowLeagth = RowLeagth .. " "
+                end 
+
+                -- draws the line
+                --loots at if its in the buffer already
+                if UseBuffer == false then ScreenBuffer[y] = nil end
+                if ScreenBuffer[y] == Row then
+                else
+                    --draws the line
+                    term.setCursorPos(1,y)
+                    term.blit(RowLeagth,Row,Row)
+                    --again in case you wanna see it draw in slow mo
                     --os.sleep(0.1)
-                    ScreenBuffer[x .. ":" .. y] = Charactor
+                    --adds to buffer
+                    ScreenBuffer[y] = Row
                 end
-            end 
+            end
         end
     else
-        --repeat for every line
-        for y=0, (MoniterY - 1) do
-            --these values are used for what it should right and what colors it should use
-            Row = ""
-            RowLeagth = ""
-            --runs through the line and gets the color and the char
-            for x=0, 163 do
-                --get the char
-                ChractorNumber = y + (x * (MoniterY - 1)) + 128
-                Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
-                --looks if its the end of the line
-                if Charactor == "" then break end
-                --adds the char to the row
-                Row = Row .. CharactorToBlit[Charactor]
-                RowLeagth = RowLeagth .. " "
-            end 
+        if UseTermBlit == false then
+            print("sorry we haven't made non term.blit supported yet with the new render method")
 
-            -- draws the line
-            --loots at if its in the buffer already
-            if UseBuffer == false then ScreenBuffer[y] = nil end
-            if ScreenBuffer[y] == Row then
-            else
+
+
+
+
+
+        else
+            --repeat for every line
+            for y=0, (MoniterY / 3) - 1 do
+                --these values are used for what it should right and what colors it should use
+                FristColor = ""
+                secandColor = ""
+                Letters = ""
+                --runs through the line and gets the color and the char
+                for x=0, (MoniterX / 2) do
+                    --get the frist color
+                    ChractorNumber = ((x + (y * ((MoniterX / 2) - 1))) * 3) + 129
+                    -- print(ChractorNumber)
+                    FristCharactor = string.sub(contents, ChractorNumber + 1, ChractorNumber + 1)
+                    --get the secand color
+
+                    -- print(ChractorNumber)
+                    SecandCharactor = string.sub(contents, ChractorNumber + 2, ChractorNumber + 2)
+
+                    -- get chactor to draw
+
+                    -- print(ChractorNumber)
+                    Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
+                    
+
+                    --looks if its the end of the line
+                    if Charactor == "" then break end
+                    -- print("Charactor : " .. Charactor)
+                    BinToConvert = CharactorToBinary[Charactor]
+                    --convert the binary to the not but is unicode?
+                    BinValue = 0x80
+                    AltBinValue = 0x80
+                    -- value : 0x80 
+                    -- frist value : 0x1 
+                    -- secand value : 0x2
+                    -- third value : 0x4
+                    -- fourth value : 0x8
+                    -- fifth value : 0x10
+                    -- in order to change 6th we enable all and then flip the colors
+                
+                    -- print("BinToConvert : " .. BinToConvert)
+                    if string.sub(BinToConvert,0,0) == "1" then
+                        BinValue = BinValue + 0x1
+                    else
+                        AltBinValue = AltBinValue + 0x1
+                    end
+
+                    if string.sub(BinToConvert,1,1) == "1" then
+                        BinValue = BinValue + 0x2
+                    else
+                        AltBinValue = AltBinValue + 0x2
+                    end
+
+                    if string.sub(BinToConvert,2,2) == "1" then
+                        BinValue = BinValue + 0x4
+                    else
+                        AltBinValue = AltBinValue + 0x4
+                    end
+
+                    if string.sub(BinToConvert,3,3) == "1" then
+                        BinValue = BinValue + 0x8
+                    else
+                        AltBinValue = AltBinValue + 0x8
+                    end
+
+                    if string.sub(BinToConvert,4,4) == "1" then
+                        BinValue = BinValue + 0x10
+                    else
+                        AltBinValue = AltBinValue + 0x10
+                    end
+                    -- print("BinValue : " .. BinValue)
+
+
+                    --adds the char to the row
+                    if string.sub(BinToConvert,5,5) == "1" then
+                        Letters = Letters .. string.char(BinValue)
+                    else
+                        Letters = Letters .. string.char(AltBinValue)
+                    end
+                    -- print("Letters : " .. Letters)
+                    -- print(FristCharactor)
+                    -- print (SecandCharactor)
+                    -- print(CharactorToBlit[tostring(FristCharactor)])
+                    -- print(CharactorToBlit[tostring(SecandCharactor)])
+
+                    FristColor = FristColor .. CharactorToBlit[tostring(FristCharactor)]
+                    secandColor = secandColor .. CharactorToBlit[tostring(SecandCharactor)]
+                    -- print("FristColor : " .. FristColor)
+                    -- print("secandColor : " .. secandColor)
+                    -- print("Letters : " .. Letters)
+                    -- print(" --- ")
+
+                end 
+
+
                 --draws the line
-                term.setCursorPos(1,y)
-                term.blit(RowLeagth,Row,Row)
+                term.setCursorPos(1,y )
+                --print("Ehsyh5ys45yhrse5yh5reyh")
+                term.blit(Letters,FristColor,secandColor)
                 --again in case you wanna see it draw in slow mo
                 --os.sleep(0.1)
                 --adds to buffer
                 ScreenBuffer[y] = Row
+
             end
         end
     end
 
-
     term.setCursorPos(1,1)
-end
-
-if UseDevMode == true then
-    os.sleep(DevModeWaitTime)
-    shell.run("VideoPlayer.lua")
 end
