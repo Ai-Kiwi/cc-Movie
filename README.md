@@ -2,7 +2,7 @@
 a program i made for playing movies or videos in cc tweaked
 
 What this program can do  
-20fps video! (sometimes 15-10)  
+upto 20fps video!  
 play video from a file  
 play video from your screen  
 
