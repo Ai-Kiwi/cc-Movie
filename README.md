@@ -9,7 +9,7 @@ make it perform compression.
 add gui into moniter.  
 make it so pixels can use the sub pixel thing (allows me to doubble screen width resulastion and triple hight resolution).  
 smart algream to use term.clear when best.  
-make python server no like constently changeing stuff breaking buffer.  
+make python server not constently changeing stuff breaking buffer by changing colors.  
 change to websockets for files online. (also let clinet pick frame to display)  
 
 
