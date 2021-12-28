@@ -74,7 +74,7 @@ def main():
     if False:
         image = Image.open(InPutFile)
     else:
-        image = ImageGrab.grab(all_screens=True)
+        image = ImageGrab.grab()
         #bbox = (0, 0, 2560 , 1440 )
         #image = ImageGrab.grab(bbox)
     
