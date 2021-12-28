@@ -15,7 +15,7 @@ change to websockets for files online. (also let clinet pick frame to display)
 
 
 **demo picture**
-![image](https://user-images.githubusercontent.com/66819523/147517125-7a4c61b7-ba61-4d35-a189-064a23d34f72.png)
+![image](https://user-images.githubusercontent.com/66819523/147517423-4d920f6a-35ef-493f-be69-312fffdc404b.png)
 
 
 
