@@ -51,12 +51,21 @@ else:
 # MoniterX = 80
 # MoniterY = 45
 
+LastFrame = 0
+start = 0
+
+
 def main():
-    print("starting main")
+    global start
+    #print("starting main")
     InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\image-1.png")
     OutPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\image-2.png")
-
-
+    
+    end = time.time()
+    LastFrame = (end - start)
+    start = time.time()
+    
+    print("FPS : " + str(1 / LastFrame))
 
 
 
@@ -65,14 +74,14 @@ def main():
     if False:
         image = Image.open(InPutFile)
     else:
-        bbox = (0, 0, 2560 , 1440 )
-        image = ImageGrab.grab(bbox)
-
+        image = ImageGrab.grab(all_screens=True)
+        #bbox = (0, 0, 2560 , 1440 )
+        #image = ImageGrab.grab(bbox)
     
 
 
 
-
+    
     #max size of moniters
     image = image.resize((MoniterX, MoniterY))
     #max size of moniters with complex fomula stuff
@@ -84,12 +93,12 @@ def main():
     #get the palette of the image
     palette = image.getpalette()
     #print(palette)
+    
 
 
 
 
-
-
+    
     hex_codes_list = []
     #convert list to hex codes
     for i in range(0, 16):
@@ -103,6 +112,11 @@ def main():
     width, height = image.size
     
     if UseComplexImage == False:
+
+        
+    
+    
+
         #run through every pixel in the image and give a int for which item on the list hex_codes_list it is.
         for x in range(1, width):
             for y in range(1, height):
@@ -110,6 +124,9 @@ def main():
                 output = image.getpixel((x, y))
                 #convert to chactor
                 ScreenCode = (ScreenCode + chr(output + 42))
+
+       
+
     else:
                 #run through every pixel in the image and give a int for which item on the list hex_codes_list it is.
         
@@ -216,7 +233,7 @@ def main():
     #print(ScreenCode)
 
     #image.save(OutPutFile, "PNG")
-    print("finished main")
+    #print("finished main")
     return ScreenCode
     
 
