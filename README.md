@@ -23,5 +23,9 @@ patch how glitchy the sound is
 please keep in mind this needs the Cryptographic Accelerator from bperipherals  
 also make sure to go in and set everything up in the settings as right now there is no gui for it  
 
-
+settings notes  
+the biggestest settings to change is  
+1 speakers  
+2 sound file and input file  
+3 SoundBufferSize (the higher this the better frame rates but worse audio quality (ill fix this bug later) )
 
