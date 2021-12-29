@@ -1,13 +1,12 @@
--- trys to remove unneeded redraw calls
--- works alot better without UseTermBlit on.
--- due to the fact that blit draws it all in 1 call it kinda makes this irrelevant
-UseBuffer = false
--- this is a remade video player that is alot faster and doesnt have any where as much screen tear
-UseTermBlit = true
+
 -- dont change this value here change below
 UseDevMode = false
 DevModeWaitTime = 5
 IpToConnectTo = "http://localhost:8080/"
+SizeOfSoundBuffer = 6000
+LastSpeakerUpdate = 0
+SpeakersToUse = {"speaker_0","speaker_4"}
+
 
 --chanelog 
 --made value moniter size
@@ -24,6 +23,9 @@ MoniterX = 164
 MoniterY = 81
 end
 
+
+local dfpwm = require("cc.audio.dfpwm")
+local decoder = dfpwm.make_decoder()
 --UseComplexImage = false
 
 
@@ -226,48 +228,23 @@ while true do
     ScreenBuffer = {}
     end
 
-    --tests if its using the newer render method or the old crappy one
+    --tests if its using the newer render method
     if UseComplexImage == false then
-        if UseTermBlit == false then
-            --term.clear()
-            --repeat for every char in the file
-            for y=0, MoniterY do
-                for x=0, MoniterX do
-                    --get the char
-                    ChractorNumber = y + (x * (MoniterY - 1)) + 128
-                    Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
-                    --get the color
-                    if UseBuffer == false then ScreenBuffer[x .. ":" .. y] = nil end
-                    -- looks if its already in the buffer (meaning its that color already)
-                    if ScreenBuffer[x .. ":" .. y] == Charactor then
-                    else
-                        --draw the pixel
-                        if Charactor == "" then break end
-                        --sets the pos and the color of the pixel
-                        moniter.setBackgroundColor(CharactorToDec[Charactor])
-                        moniter.setCursorPos(x + 1, y)
-                        --draws the pixel
-                        moniter.write(" ")
-                        --used in case you wanna see it draw in slow mo
-                        --os.sleep(0.1)
-                        ScreenBuffer[x .. ":" .. y] = Charactor
-                    end
-                end 
-            end
-        else
             --repeat for every line
             for y=0, (MoniterY - 1) do
                 --these values are used for what it should right and what colors it should use
                 Row = ""
                 RowLeagth = ""
                 --runs through the line and gets the color and the char
-                for x=0, (MoniterX - 1) do
+                for x=0, (MoniterX - 2) do
                     --get the char
                     ChractorNumber = y + (x * (MoniterY - 1)) + 128
                     Charactor = string.sub(contents, ChractorNumber, ChractorNumber)
                     --looks if its the end of the line
                     if Charactor == "" then break end
                     --adds the char to the row
+                    --print(x,":",y)
+                    --print(Charactor)
                     Row = Row .. CharactorToBlit[Charactor]
                     RowLeagth = RowLeagth .. " "
                 end 
@@ -286,17 +263,7 @@ while true do
                     ScreenBuffer[y] = Row
                 end
             end
-        end
     else
-        if UseTermBlit == false then
-            print("sorry we haven't made non term.blit supported yet with the new render method")
-
-
-
-
-
-
-        else
             --repeat for every line
             for y=0, (MoniterY / 3) - 1 do
                 --these values are used for what it should right and what colors it should use
@@ -400,8 +367,36 @@ while true do
                 ScreenBuffer[y] = Row
 
             end
-        end
     end
 
     term.setCursorPos(1,1)
+
+
+    if math.floor(LastSpeakerUpdate) == math.floor(os.clock()) then
+    else   
+        LastSpeakerUpdate = math.floor(os.clock())
+
+        --get sound data from the file
+        soundData = ""
+        NumberUpto = 1
+        while true do
+            soundData = soundData .. string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto)
+            NumberUpto = NumberUpto + 1
+            if string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto) == "" then break end
+        end
+
+
+
+
+        term.setTextColor(colors.white)
+        crypto = peripheral.find("cryptographic_accelerator")
+        for i=1, #SpeakersToUse do
+            speaker = peripheral.wrap(SpeakersToUse[i])
+
+            --speaker.stop()
+            --print("soundData : " .. "start:" .. soundData .. ":end")
+            speaker.playAudio(decoder(crypto.decodeBase64(soundData)))
+        end
+
+    end
 end
