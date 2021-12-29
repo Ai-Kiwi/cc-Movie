@@ -1,11 +1,14 @@
 UseComplexImage = False
-FrameRate = 30
+FrameRate = 27.74
 SoundBufferSize = 6
+SoundOffset = 0
 # please keep in mind sound file must be in dfpwm file format for a converter link cheek out the link below
 # music.madefor.cc
 SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.dfpwm")
 InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.mp4")
 
+SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.dfpwm")
+InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
 
 #open a iamge
 #read the image
@@ -60,12 +63,16 @@ start = 0
 FrameToRead = 0
 
 
-
+NewThread = 0
 vidcap = cv2.VideoCapture(InPutFile)
 ProgramStartTime = 0
-
+HasBeenRun = 0
+Result = {}
 
 def main():
+    global Result
+    global NewThread
+    global HasBeenRun
     global FrameToRead
     global ProgramStartTime
     global start
@@ -79,23 +86,35 @@ def main():
     
     print("FPS : " + str(1 / LastFrame))
 
-
-
-    #print("Input file: " + InPutFile)
-    #print("Output file: " + OutPutFile)
-    if True:
-
-        FrameToRead = time.time()
-        FrameToRead = math.floor((FrameToRead - ProgramStartTime) * FrameRate)
+    def GetFrameData(Result,vidcap,FrameToRead):
+        
         #print(FrameToRead)
-
         vidcap.set(1, FrameToRead)
         success,cv2_image = vidcap.read()
         #print(success)
         img = cv2.cvtColor(cv2_image, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(img)
-        #image = Image.open(InPutFile)
-        #image.seek(2)
+        Result[1] = Image.fromarray(img)
+
+    #print("Input file: " + InPutFile)
+    #print("Output file: " + OutPutFile)
+    if True:
+        
+        if HasBeenRun == 1:
+            NewThread.join()
+            #print("Thread joined")
+            print(Result[1])
+            image = Result[1]
+        else:
+            GetFrameData(Result,vidcap,FrameToRead)
+            image = Result[1]
+
+        Result = {}
+        FrameToRead = time.time()
+        FrameToRead = math.floor((FrameToRead - ProgramStartTime) * FrameRate)
+        NewThread = Thread(target=GetFrameData, args=([Result,vidcap,FrameToRead]))
+        NewThread.start()
+        HasBeenRun = 1
+
     else:
         image = ImageGrab.grab()
         #bbox = (0, 0, 2560 , 1440 )
@@ -107,7 +126,6 @@ def main():
     
     #max size of moniters
     image = image.resize((MoniterX, MoniterY))
-    #max size of moniters with complex fomula stuff
     #image = image.resize((328, 243))
 
     #convert the image to limited resolution and only use 16 colors
@@ -282,7 +300,7 @@ class MyServer(BaseHTTPRequestHandler):
         SoundDataObject = open(SoundInPutFile, "rb")
         #the amt of data a secand is 6000 bytes
         #this will jump to the data that we are upto
-        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * (SoundBufferSize * 1000)))
+        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * (SoundBufferSize * 1000)) + SoundOffset)
         #this will read the next 6000 bytes
         SoundData = SoundDataObject.read(SoundBufferSize * 1000)
         tostring = base64.b64encode(SoundData)
