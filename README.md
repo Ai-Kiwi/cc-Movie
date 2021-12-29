@@ -12,7 +12,8 @@ make it perform compression.
 add gui into moniter.  
 make it so pixels can use the sub pixel thing (allows me to doubble screen width resulastion and triple hight resolution).  
 make python server not constently changeing stuff breaking buffer by changing colors.  
-change to websockets for files online.
+change to websockets for files online.  
+patch how glitchy the sound is  
 
 
 
