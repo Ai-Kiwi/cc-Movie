@@ -28,4 +28,4 @@ the biggestest settings to change is
 1 speakers  
 2 sound file and input file  
 3 SoundBufferSize (the higher this the better frame rates but worse audio quality (ill fix this bug later) )
-
+4 also make sure that you have the right framerate set
