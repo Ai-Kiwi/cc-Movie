@@ -20,7 +20,8 @@ change to websockets for files online.
 **demo picture**
 ![image](https://user-images.githubusercontent.com/66819523/147517423-4d920f6a-35ef-493f-be69-312fffdc404b.png)
 
-
+please keep in mind this needs the Cryptographic Accelerator from bperipherals  
+also make sure to go in and set everything up in the settings as right now there is no gui for it  
 
 
 
