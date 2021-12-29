@@ -4,9 +4,9 @@ SoundBufferSize = 6
 UseDevMode = false
 DevModeWaitTime = 5
 IpToConnectTo = "http://localhost:8080/"
-SizeOfSoundBuffer = 12000
+SizeOfSoundBuffer = 6
 LastSpeakerUpdate = 0
-SpeakersToUse = {"left"}
+SpeakersToUse = {"speaker_7"}
 
 
 --chanelog 
@@ -68,13 +68,16 @@ local function HandleMusicStuff()
 end
 
 while true do
-
-    local request = http.get(IpToConnectTo)
-    if request == nil then
-        break
+    if contents == nil then
+        local request = http.get(IpToConnectTo)
+        if request == nil then
+            break
+        end
+        contents = request.readAll()
+        request.close()
     end
-    contents = request.readAll()
-    request.close()
+    http.request(IpToConnectTo)
+    
     
     HandleMusicStuff()
 
@@ -406,6 +409,15 @@ while true do
     end
 
     term.setCursorPos(1,1)
-
-
+    RepeatNumberUpto = 0
+    repeat
+        RepeatNumberUpto = RepeatNumberUpto + 1
+        event, url, handle = os.pullEvent("http_success")
+        if RepeatNumberUpto > 10 then
+            print("Failed to get the image")
+            break
+        end
+    until url == IpToConnectTo
+    contents = handle.readAll()
+    handle.close()
 end
