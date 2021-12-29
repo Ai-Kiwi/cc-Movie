@@ -8,7 +8,6 @@ play video from your screen
 
 Todo :  
 clean up code.  
-add support for sound.  
 make it perform compression.  
 add gui into moniter.  
 make it so pixels can use the sub pixel thing (allows me to doubble screen width resulastion and triple hight resolution).  
