@@ -1,4 +1,11 @@
 UseComplexImage = False
+FrameRate = 30
+
+# please keep in mind sound file must be in dfpwm file format for a converter link cheek out the link below
+# music.madefor.cc
+SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.dfpwm")
+InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.mp4")
+OutPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\image-2.png")
 
 
 #open a iamge
@@ -17,19 +24,14 @@ UseComplexImage = False
 #convert the image to 4bit
 #save the image
 
-import asyncio
 from asyncio.windows_events import NULL
-import threading
 from types import FrameType
-import websockets
-import os
-import sys
-import argparse
 from colormap import rgb2hex
 import math
 import time
 from threading import Thread
 import cv2
+import base64
 
 from PIL import Image
 from PIL import ImageGrab
@@ -56,19 +58,21 @@ else:
 
 LastFrame = 0
 start = 0
+FrameToRead = 0
 
-SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.dfpwm")
-InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.mp4")
-OutPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\image-2.png")
+
 
 vidcap = cv2.VideoCapture(InPutFile)
+ProgramStartTime = 0
 
-ProgramStartTime = time.time()
 
 def main():
+    global FrameToRead
+    global ProgramStartTime
     global start
     #print("starting main")
-
+    if ProgramStartTime == 0:
+        ProgramStartTime = time.time()
     
     end = time.time()
     LastFrame = (end - start)
@@ -83,7 +87,7 @@ def main():
     if True:
 
         FrameToRead = time.time()
-        FrameToRead = math.floor((FrameToRead - ProgramStartTime) * 30)
+        FrameToRead = math.floor((FrameToRead - ProgramStartTime) * FrameRate)
         #print(FrameToRead)
 
         vidcap.set(1, FrameToRead)
@@ -258,9 +262,6 @@ def main():
     
 
     
-print("started")
-main()
-print("ended")
 
 # server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -270,28 +271,42 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 
-def HostVideoServer():
-    hostName = "localhost"
-    serverPort = 8080
+hostName = "localhost"
+serverPort = 8080
 
-    class MyServer(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            self.wfile.write(bytes(main(), "utf-8"))
+class MyServer(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(bytes(main(), "utf-8"))
+        SoundDataObject = open(SoundInPutFile, "rb")
+        #the amt of data a secand is 6000 bytes
+        #this will jump to the data that we are upto
+        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * 6000))
+        
+        #this will read the next 6000 bytes
+        SoundData = SoundDataObject.read(6000)
+        tostring = base64.b64encode(SoundData)
+        
+        tostring = tostring.decode("utf-8")
+        #print(tostring)
+        self.wfile.write(bytes(str(tostring), "utf-8"))
+        
 
-    if __name__ == "__main__":        
-        webServer = HTTPServer((hostName, serverPort), MyServer)
-        print("Server started http://%s:%s" % (hostName, serverPort))
+        SoundDataObject.close()
 
-        try:
-            webServer.serve_forever()
-        except KeyboardInterrupt:
-            pass
+if __name__ == "__main__":        
+    webServer = HTTPServer((hostName, serverPort), MyServer)
+    print("Server started http://%s:%s" % (hostName, serverPort))
 
-        webServer.server_close()
-        print("Server stopped.")
+    try:
+        webServer.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    webServer.server_close()
+    print("Server stopped.")
 
 
 #idea below is a sketch btw
@@ -299,39 +314,9 @@ def HostVideoServer():
 # the clinet is ganna know what to play by this will update every so often ahead of the video playing
 # when the clinet sees this update or it says it updates int he video? it will start playing new music
 
-def HostSoundServer():
-    hostName = "localhost"
-    serverPort = 8000
-
-    class MyServer(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
-            f = open(SoundInPutFile,'rb')
-            #self.wfile.write(bytes(f.read(), "utf-8"))
-            self.wfile.write(f.read())
-            f.close()
-
-
-    if __name__ == "__main__":        
-        webServer = HTTPServer((hostName, serverPort), MyServer)
-        print("Server started http://%s:%s" % (hostName, serverPort))
-
-        try:
-            webServer.serve_forever()
-        except KeyboardInterrupt:
-            pass
-
-        webServer.server_close()
-        print("Server stopped.")
 
 
 
 
 
-
-#create a thread to run both servers at once
-threading.Thread(target=HostVideoServer).start()
-#threading.Thread(target=HostSoundServer).start()
 
