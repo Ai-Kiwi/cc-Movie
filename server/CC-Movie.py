@@ -1,11 +1,10 @@
 UseComplexImage = False
 FrameRate = 30
-
+SoundBufferSize = 6
 # please keep in mind sound file must be in dfpwm file format for a converter link cheek out the link below
 # music.madefor.cc
-SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.dfpwm")
-InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-1.mp4")
-OutPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\image-2.png")
+SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.dfpwm")
+InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.mp4")
 
 
 #open a iamge
@@ -283,10 +282,9 @@ class MyServer(BaseHTTPRequestHandler):
         SoundDataObject = open(SoundInPutFile, "rb")
         #the amt of data a secand is 6000 bytes
         #this will jump to the data that we are upto
-        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * 6000))
-        
+        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * (SoundBufferSize * 1000)))
         #this will read the next 6000 bytes
-        SoundData = SoundDataObject.read(6000)
+        SoundData = SoundDataObject.read(SoundBufferSize * 1000)
         tostring = base64.b64encode(SoundData)
         
         tostring = tostring.decode("utf-8")
@@ -309,10 +307,6 @@ if __name__ == "__main__":
     print("Server stopped.")
 
 
-#idea below is a sketch btw
-
-# the clinet is ganna know what to play by this will update every so often ahead of the video playing
-# when the clinet sees this update or it says it updates int he video? it will start playing new music
 
 
 
