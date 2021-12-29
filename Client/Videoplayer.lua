@@ -1,11 +1,12 @@
 
+SoundBufferSize = 6
 -- dont change this value here change below
 UseDevMode = false
 DevModeWaitTime = 5
 IpToConnectTo = "http://localhost:8080/"
-SizeOfSoundBuffer = 6000
+SizeOfSoundBuffer = 12000
 LastSpeakerUpdate = 0
-SpeakersToUse = {"speaker_0","speaker_4"}
+SpeakersToUse = {"left"}
 
 
 --chanelog 
@@ -36,12 +37,47 @@ local decoder = dfpwm.make_decoder()
 
 --start drawing on moniter
 
+local function HandleMusicStuff()
+    if math.floor(LastSpeakerUpdate) == math.floor(os.clock() * (SoundBufferSize / 6)) then
+    else   
+        LastSpeakerUpdate = math.floor(os.clock() / (SoundBufferSize / 6))
+        --term.clear()
+        --get sound data from the file
+        soundData = ""
+        NumberUpto = 1
+        while true do
+            soundData = soundData .. string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto)
+            NumberUpto = NumberUpto + 1
+            if string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto) == "" then break end
+        end
+
+
+
+
+        term.setTextColor(colors.white)
+        crypto = peripheral.find("cryptographic_accelerator")
+        for i=1, #SpeakersToUse do
+            speaker = peripheral.wrap(SpeakersToUse[i])
+
+            --speaker.stop()
+            --print("soundData : " .. "start:" .. soundData .. ":end")
+            speaker.playAudio(decoder(crypto.decodeBase64(soundData)))
+        end
+
+    end
+end
 
 while true do
 
     local request = http.get(IpToConnectTo)
+    if request == nil then
+        break
+    end
     contents = request.readAll()
     request.close()
+    
+    HandleMusicStuff()
+
 
     --get data from web
     pallete = {}
@@ -372,31 +408,4 @@ while true do
     term.setCursorPos(1,1)
 
 
-    if math.floor(LastSpeakerUpdate) == math.floor(os.clock()) then
-    else   
-        LastSpeakerUpdate = math.floor(os.clock())
-
-        --get sound data from the file
-        soundData = ""
-        NumberUpto = 1
-        while true do
-            soundData = soundData .. string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto)
-            NumberUpto = NumberUpto + 1
-            if string.sub(contents, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto, ((MoniterX - 1) * (MoniterY - 1)) + 128 + NumberUpto) == "" then break end
-        end
-
-
-
-
-        term.setTextColor(colors.white)
-        crypto = peripheral.find("cryptographic_accelerator")
-        for i=1, #SpeakersToUse do
-            speaker = peripheral.wrap(SpeakersToUse[i])
-
-            --speaker.stop()
-            --print("soundData : " .. "start:" .. soundData .. ":end")
-            speaker.playAudio(decoder(crypto.decodeBase64(soundData)))
-        end
-
-    end
 end
