@@ -10,8 +10,8 @@ InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.mp4")
 SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.dfpwm")
 InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
 
-#SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\harry potter audio file\\Harry_Potter_and_the_Philosophers_Stone_2001.dfpwm")
-#InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\formated harry potter\\Harry_Potter_and_the_Philosophers_Stone_2001.mp4")
+SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\harry potter audio file\\Harry_Potter_and_the_Philosophers_Stone_2001.dfpwm")
+InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\formated harry potter\\Harry_Potter_and_the_Philosophers_Stone_2001.mp4")
 
 #multiplySound = multiplySound * (30 / FrameRate)
 
@@ -34,17 +34,13 @@ InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
 from http import server
 from asyncio.windows_events import NULL
 import threading
-from types import FrameType
-from typing import Text
-import PIL
-from colormap import colors, rgb2hex
 import math
 import time
 from threading import Thread
 import cv2
 import base64
 import tkinter
-import asyncio
+import os
 
 from PIL import Image
 from PIL import ImageGrab
@@ -392,7 +388,8 @@ threading.Thread(target=StartUpServer).start()
 
 tinkWindow = tkinter.Tk()
 tinkWindow.geometry("800x450") 
-tinkWindow.title("Scale")
+tinkWindow.focus()
+tinkWindow.title("CC Movie Control panel")
 l1=tkinter.Label(tinkWindow,text="Progress Bar (measurement in frame)") 
 l1.grid(row=1,column=2)
 
@@ -407,7 +404,7 @@ tinkWindow.mainloop()
 #
 #
 #starts a thread for the main gui
-print("im still running")
+os._exit(1)
 
 
 
