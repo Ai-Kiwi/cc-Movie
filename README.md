@@ -2,7 +2,7 @@
 a program i made for playing movies or videos in cc tweaked
 
 What this program can do  
-over 30fps video!  
+over 30fps video! (keep in mind this is localhost (will fix later when i make really high levels of buffering))  
 play video from a file  
 play video from your screen  
 
