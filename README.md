@@ -7,6 +7,7 @@ play video from a file
 play video from your screen  
 
 Todo :  
+add more stuff to server gui like a display and maybe put settings onto that?  
 clean up code.  
 make it perform compression.  
 add gui into moniter.  
