@@ -1,14 +1,16 @@
 UseComplexImage = False
-FrameRate = 27.74
 SoundBufferSize = 6
 SoundOffset = 0
+multiplySound = 1
 # please keep in mind sound file must be in dfpwm file format for a converter link cheek out the link below
 # music.madefor.cc
 SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.dfpwm")
 InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.mp4")
 
-SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.dfpwm")
+SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.dfpwm")
 InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
+
+#multiplySound = multiplySound * (30 / FrameRate)
 
 #open a iamge
 #read the image
@@ -69,7 +71,15 @@ ProgramStartTime = 0
 HasBeenRun = 0
 Result = {}
 
+FrameRate = vidcap.get(cv2.CAP_PROP_FPS)
+print(FrameRate)
+
+
+
+
+
 def main():
+    global FrameRate
     global Result
     global NewThread
     global HasBeenRun
@@ -90,6 +100,7 @@ def main():
         
         #print(FrameToRead)
         vidcap.set(1, FrameToRead)
+        
         success,cv2_image = vidcap.read()
         #print(success)
         img = cv2.cvtColor(cv2_image, cv2.COLOR_BGR2RGB)
@@ -292,7 +303,9 @@ hostName = "localhost"
 serverPort = 8080
 
 class MyServer(BaseHTTPRequestHandler):
+    global FrameRate
     def do_GET(self):
+        print(FrameRate)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
@@ -300,7 +313,8 @@ class MyServer(BaseHTTPRequestHandler):
         SoundDataObject = open(SoundInPutFile, "rb")
         #the amt of data a secand is 6000 bytes
         #this will jump to the data that we are upto
-        SoundDataObject.read(math.floor((FrameToRead / FrameRate) * (SoundBufferSize * 1000)) + SoundOffset)
+        print("Sound Time" + str(FrameToRead / FrameRate))
+        SoundDataObject.read(math.floor((((FrameToRead / FrameRate) * 6000) * multiplySound) + SoundOffset))
         #this will read the next 6000 bytes
         SoundData = SoundDataObject.read(SoundBufferSize * 1000)
         tostring = base64.b64encode(SoundData)
