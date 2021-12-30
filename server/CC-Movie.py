@@ -10,6 +10,9 @@ InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\video-2.mp4")
 SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.dfpwm")
 InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
 
+#SoundInPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\harry potter audio file\\Harry_Potter_and_the_Philosophers_Stone_2001.dfpwm")
+#InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\formated harry potter\\Harry_Potter_and_the_Philosophers_Stone_2001.mp4")
+
 #multiplySound = multiplySound * (30 / FrameRate)
 
 #open a iamge
@@ -28,14 +31,20 @@ InPutFile = ("C:\\Users\\Ai Kiwi\\Desktop\\shrek2.3.mp4")
 #convert the image to 4bit
 #save the image
 
+from http import server
 from asyncio.windows_events import NULL
+import threading
 from types import FrameType
-from colormap import rgb2hex
+from typing import Text
+import PIL
+from colormap import colors, rgb2hex
 import math
 import time
 from threading import Thread
 import cv2
 import base64
+import tkinter
+import asyncio
 
 from PIL import Image
 from PIL import ImageGrab
@@ -63,22 +72,35 @@ else:
 LastFrame = 0
 start = 0
 FrameToRead = 0
-
+LastFrameThatWasBeingPlayed = 0
+ProgramOffset = 0
 
 NewThread = 0
 vidcap = cv2.VideoCapture(InPutFile)
 ProgramStartTime = 0
 HasBeenRun = 0
 Result = {}
+MovieIsPaused = False
+
+NumberOfFrames =  int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+
+
 
 FrameRate = vidcap.get(cv2.CAP_PROP_FPS)
 print(FrameRate)
+
+#creates a window that contains all the stuff for changing what frame is being drawn
+
 
 
 
 
 
 def main():
+    global MovieIsPaused
+    global ProgramOffset
+    global Frame_scale
     global FrameRate
     global Result
     global NewThread
@@ -120,8 +142,29 @@ def main():
             image = Result[1]
 
         Result = {}
-        FrameToRead = time.time()
-        FrameToRead = math.floor((FrameToRead - ProgramStartTime) * FrameRate)
+        #looks if the person has moved the slider
+        OldFrameToRead = FrameToRead
+        FrameToRead = Frame_scale.get()
+
+        if OldFrameToRead != FrameToRead:
+            ProgramOffset = ProgramOffset + (FrameToRead - OldFrameToRead)
+
+        NewFrameToRead = time.time()
+        NewFrameToRead = math.floor((NewFrameToRead - ProgramStartTime) * FrameRate)
+
+        if not MovieIsPaused: 
+            FrameToRead = NewFrameToRead
+            FrameToRead = FrameToRead + ProgramOffset
+
+        Frame_scale.set(FrameToRead)
+
+        #ProgramOffset = 
+        
+        #print(FrameToRead)
+        #update image that is being displayed
+        #DisplayImage = image
+        
+
         NewThread = Thread(target=GetFrameData, args=([Result,vidcap,FrameToRead]))
         NewThread.start()
         HasBeenRun = 1
@@ -145,7 +188,7 @@ def main():
     #get the palette of the image
     palette = image.getpalette()
     #print(palette)
-    
+
 
 
 
@@ -292,57 +335,79 @@ def main():
     
 
 # server example
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 
 
+def StartUpServer():
+    hostName = "localhost"
+    serverPort = 8080
+
+    class MyServer(server.BaseHTTPRequestHandler):
+        global FrameRate
+        def do_GET(self):
+            #print(FrameRate)
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write(bytes(main(), "utf-8"))
+            SoundDataObject = open(SoundInPutFile, "rb")
+            #the amt of data a secand is 6000 bytes
+            #this will jump to the data that we are upto
+            #print("Sound Time" + str(FrameToRead / FrameRate))
+            SoundDataObject.read(math.floor((((FrameToRead / FrameRate) * 6000) * multiplySound) + SoundOffset))
+            #this will read the next 6000 bytes
+            SoundData = SoundDataObject.read(SoundBufferSize * 1000)
+            tostring = base64.b64encode(SoundData)
+
+            tostring = tostring.decode("utf-8")
+            #print(tostring)
+            self.wfile.write(bytes(str(tostring), "utf-8"))
 
 
-hostName = "localhost"
-serverPort = 8080
+            SoundDataObject.close()
+    
+    if __name__ == "__main__":        
+        #webServer = server.HTTPServer((hostName, serverPort), MyServer)
+        webServer = server.ThreadingHTTPServer((hostName, serverPort), MyServer)
+        print("Server started http://%s:%s" % (hostName, serverPort))
 
-class MyServer(BaseHTTPRequestHandler):
-    global FrameRate
-    def do_GET(self):
-        print(FrameRate)
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(bytes(main(), "utf-8"))
-        SoundDataObject = open(SoundInPutFile, "rb")
-        #the amt of data a secand is 6000 bytes
-        #this will jump to the data that we are upto
-        print("Sound Time" + str(FrameToRead / FrameRate))
-        SoundDataObject.read(math.floor((((FrameToRead / FrameRate) * 6000) * multiplySound) + SoundOffset))
-        #this will read the next 6000 bytes
-        SoundData = SoundDataObject.read(SoundBufferSize * 1000)
-        tostring = base64.b64encode(SoundData)
-        
-        tostring = tostring.decode("utf-8")
-        #print(tostring)
-        self.wfile.write(bytes(str(tostring), "utf-8"))
-        
+        try:
+            webServer.serve_forever()
+        except KeyboardInterrupt:
+            pass
 
-        SoundDataObject.close()
-
-if __name__ == "__main__":        
-    webServer = HTTPServer((hostName, serverPort), MyServer)
-    print("Server started http://%s:%s" % (hostName, serverPort))
-
-    try:
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
-
-    webServer.server_close()
-    print("Server stopped.")
-
-
-
+        webServer.server_close()
+        print("Server stopped.")
 
 
 
+#StartUpServer()
+
+def Pause():
+    global MovieIsPaused
+    MovieIsPaused = not MovieIsPaused
+
+threading.Thread(target=StartUpServer).start()
+
+tinkWindow = tkinter.Tk()
+tinkWindow.geometry("800x450") 
+tinkWindow.title("Scale")
+l1=tkinter.Label(tinkWindow,text="Progress Bar (measurement in frame)") 
+l1.grid(row=1,column=2)
+
+b1 = tkinter.Button(tinkWindow, text="Pause", command=Pause,fg="black",bg="orange")
+b1.grid(row=2,column=1)
+
+Frame_scale = tkinter.Scale(tinkWindow, from_=1, to=NumberOfFrames, orient='horizontal',length=650,background='orange',foreground='black',highlightcolor='orange',troughcolor='black')
+Frame_scale.grid(row=2,column=2) 
+
+tinkWindow.mainloop()
+
+#
+#
+#starts a thread for the main gui
+print("im still running")
 
 
 
