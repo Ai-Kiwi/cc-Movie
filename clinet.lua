@@ -3,16 +3,7 @@ local ws = http.websocket("ws://localhost:8080/")
 local monitor = peripheral.find("monitor")
 
 monitor.setTextScale(0.5)
---TODO:
---add pause
---add skip back and forward
---add buffer for sound
---make every websocket request async
---fix frame stutter on sound catch up
---add volume control
---add error handling
---fix audio data starting with L or H making crash (same for sound and vid)
---fix audio sync breaking
+
 
 --client and server side settings
 local ImageWidth = 164

@@ -1,16 +1,6 @@
 from PIL import Image
 from collections import Counter
 
-#changes to make
-#add gui into app.
-#add error cheeking so it crashs less.
-#make it so pixels can use the sub pixel thing (allows me to doubble screen width resulastion and triple hight resolution).
-#convert websockets to binary and compress them
-#patch how glitchy the sound is
-#add huge ammounits of buffering to server and client
-#make pre render for images to make it faster
-#make code cleaner and easier to read
-#make propper github report system
 
 DirForFrame = "./Frames/"
 
