@@ -9,14 +9,14 @@ this is currently very easrly in release and the version here is the 3rd remake.
 
 
 **making image files**
+```
+best for tall videos  
+ffmpeg -i video.mp4 -vf scale=-1:81 -r 20 frame%04d.png  
 
-best for tall videos
-ffmpeg -i video.mp4 -vf scale=-1:81 -r 20 frame%04d.png
-
-best for norm (pick low res if high not needed for speed)
-ffmpeg -i video.mp4 -vf scale=164:81 -r 20 frame%04d.png #supports low res mode
-ffmpeg -i video.mp4 -vf scale=328:243 -r 20 frame%04d.png #support high res mode
-
+best for norm (pick low res if high not needed for speed)  
+ffmpeg -i video.mp4 -vf scale=164:81 -r 20 frame%04d.png #supports low res mode  
+ffmpeg -i video.mp4 -vf scale=328:243 -r 20 frame%04d.png #support high res mode  
+```
 
 
 
